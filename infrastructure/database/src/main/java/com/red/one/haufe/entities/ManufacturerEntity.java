@@ -1,36 +1,42 @@
 package com.red.one.haufe.entities;
 
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "beer")
-public class BeverageEntity extends AuditEntity {
+@Table(name = "Manufacturer")
+public class ManufacturerEntity extends AuditEntity {
+
   @Id
   @GeneratedValue(strategy= GenerationType.IDENTITY) Long id;
 
   private String name;
 
+  private String nationality;
+
   private String description;
 
-  private String type;
+  @OneToMany
+  private List<BeverageEntity> beverages;
 
-  private Double graduation;
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-  @ManyToOne
-  @JoinColumn(name = "manufacturer_id")
-  private ManufacturerEntity manufacturer;
+  public Long getId() {
+    return id;
+  }
 }
