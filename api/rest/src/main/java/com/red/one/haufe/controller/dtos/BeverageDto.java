@@ -12,21 +12,18 @@ import lombok.Setter;
 @NoArgsConstructor
 public class BeverageDto {
 
-  @JsonProperty("PRICE_LIST")
-  private UUID id;
+  @JsonProperty("id")
+  private Long id;
 
-  @JsonProperty("PRICE")
-  private String price;
+  @JsonProperty("name")
+  private String name;
 
-  @JsonProperty("PRODUCT_ID")
-  private String product_id;
+  @JsonProperty("description")
+  private String description;
 
-  @JsonProperty("BRAND_ID")
-  private Integer brandId;
+  @JsonProperty("type")
+  private String type;
 
-  private LocalDate startDate;
-
-  private LocalDate endDate;
-
-  private String currency;
+  @JsonProperty("graduation")
+  private Double graduation;
 }

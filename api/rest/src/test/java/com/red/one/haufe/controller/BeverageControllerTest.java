@@ -1,8 +1,7 @@
 package com.red.one.haufe.controller;
 
 import com.red.one.haufe.controller.mappers.BeverageDtoMapper;
-import com.red.one.haufe.haufe.controller.mappers.BeverageDtoMapperImpl;
-import com.red.one.haufe.domain.entities.Beverage;
+import com.red.one.haufe.controller.mappers.BeverageDtoMapperImpl;
 import com.red.one.haufe.domain.services.BeverageService;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

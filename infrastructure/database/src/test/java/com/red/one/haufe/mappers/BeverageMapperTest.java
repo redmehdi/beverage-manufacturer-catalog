@@ -2,11 +2,21 @@ package com.red.one.haufe.mappers;
 
 import com.red.one.haufe.BaseTest;
 import com.red.one.haufe.domain.entities.Beverage;
+import com.red.one.haufe.domain.entities.BeverageAggregate;
+import com.red.one.haufe.domain.entities.Manufacturer;
 import com.red.one.haufe.entities.BeverageEntity;
 
 import static org.junit.Assert.*;
 
+import com.red.one.haufe.entities.ManufacturerEntity;
+import org.hamcrest.CoreMatchers;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
 public class BeverageMapperTest extends BaseTest {
 
@@ -21,6 +31,15 @@ public class BeverageMapperTest extends BaseTest {
   public static final Double GRADUATION = Double.valueOf(20);
 
   private BeverageMapper mapper = new BeverageMapperImpl();
+
+  @Mock
+  private ManufacturerMapper manufacturerMapper;
+
+  @Override
+  protected void setUp() throws Exception {
+    setField(mapper, "manufacturerMapper", manufacturerMapper);
+    super.setUp();
+  }
 
   @Test
   public void mapToDomainSpecies_whenNull_shouldReturnNull() {
@@ -44,131 +63,291 @@ public class BeverageMapperTest extends BaseTest {
     assertNull(result.getGraduation());
   }
 
-  /**
-   @Test public void mapToDomainSpecies_whenNotNullParams_shouldExpectedValues() {
-   final BeverageEntity expected = new BeverageEntity(COLOR, NAME, URL, idExt);
+  @Test
+  public void mapToDomain_whenNotNullParams_shouldExpectedValues() throws Exception {
+    final BeverageEntity expected = new BeverageEntity(ID, NAME, DESCRIPTION, TYPE, GRADUATION, null);
 
-   final Beverage result = mapper.map(expected);
+    final Beverage result = mapper.map(expected);
 
-   assertNotNull(result);
-   assertEquals(expected.getColor(),result.getColor());
-   assertEquals(expected.getName(),result.getName());
-   assertNull(result.getId());
-   }
+    assertNotNull(result);
+    assertEquals(expected.getId(), result.getId());
+    assertEquals(expected.getDescription(), result.getDescription());
+    assertEquals(expected.getName(), result.getName());
+    assertEquals(expected.getType(), result.getType());
+    assertEquals(expected.getGraduation(), result.getGraduation());
+  }
 
-   @Test public void mapToDomainSpecies_whenNullColor_shouldExpectedValues() {
-   final BeverageEntity expected = new BeverageEntity(null, NAME, URL, idExt);
+  @Test
+  public void mapToDomain_whenNullGraduation_shouldExpectedValues() throws Exception {
+    final BeverageEntity expected = new BeverageEntity(ID, NAME, DESCRIPTION, TYPE, null, null);
 
-   final Beverage result = mapper.map(expected);
+    final Beverage result = mapper.map(expected);
 
-   assertNotNull(result);
-   assertNull(result.getColor());
-   assertEquals(expected.getName(),result.getName());
-   assertNull(result.getId());
-   }
+    assertNotNull(result);
+    assertEquals(expected.getId(), result.getId());
+    assertEquals(expected.getDescription(), result.getDescription());
+    assertEquals(expected.getName(), result.getName());
+    assertEquals(expected.getType(), result.getType());
+    assertNull(result.getGraduation());
+  }
 
-   @Test public void mapToDomainSpecies_whenNullName_shouldExpectedValues() {
-   final BeverageEntity expected = new BeverageEntity(COLOR, null, URL, idExt);
+  @Test
+  public void mapToDomain_whenNullType_shouldExpectedValues() throws Exception {
+    final BeverageEntity expected = new BeverageEntity(ID, NAME, DESCRIPTION, null, GRADUATION, null);
 
-   final Beverage result = mapper.map(expected);
+    final Beverage result = mapper.map(expected);
 
-   assertNotNull(result);
-   assertNull(result.getName());
-   assertEquals(expected.getColor(),result.getColor());
-   assertNull(result.getId());
-   }
+    assertNotNull(result);
+    assertEquals(expected.getId(), result.getId());
+    assertEquals(expected.getDescription(), result.getDescription());
+    assertEquals(expected.getName(), result.getName());
+    assertNull(result.getType());
+    assertEquals(expected.getGraduation(), result.getGraduation());
+  }
 
-   @Test public void mapToDomainSpecies_whenNullPokeCharacter_shouldExpectedValues() {
-   final BeverageEntity expected = new BeverageEntity(COLOR, NAME, URL, idExt);
+  @Test
+  public void mapToDomain_whenNullName_shouldExpectedValues() throws Exception {
+    final BeverageEntity expected = new BeverageEntity(ID, null, DESCRIPTION, TYPE, GRADUATION, null);
 
-   final Beverage result = mapper.map(expected);
+    final Beverage result = mapper.map(expected);
 
-   assertNotNull(result);
-   assertNotNull(result.getName());
-   assertNotNull(result.getColor());
-   assertNull(result.getId());
-   }
+    assertNotNull(result);
+    assertEquals(expected.getId(), result.getId());
+    assertEquals(expected.getDescription(), result.getDescription());
+    assertNull(result.getName());
+    assertEquals(expected.getType(), result.getType());
+    assertEquals(expected.getGraduation(), result.getGraduation());
+  }
 
-   /***
-   @Test public void mapToDomainCharacter_whenNullParams_shouldExpectedValues() {
+  @Test
+  public void mapToDomain_whenNullDescription_shouldExpectedValues() throws Exception {
+    final BeverageEntity expected = new BeverageEntity(ID, NAME, null, TYPE, GRADUATION, null);
 
-   final PokeCharacter result = mapper.map(expected);
+    final Beverage result = mapper.map(expected);
 
-   assertNotNull(result);
-   assertNull(result.getId());
-   assertNull(result.getName());
-   assertNull(result.getHeight());
-   assertNull(result.getWeight());
-   assertNull(result.getBaseExperience());
-   }
+    assertNotNull(result);
+    assertEquals(expected.getId(), result.getId());
+    assertEquals(expected.getName(), result.getName());
+    assertNull(result.getDescription());
+    assertEquals(expected.getType(), result.getType());
+    assertEquals(expected.getGraduation(), result.getGraduation());
+  }
 
-   @Test public void mapToDomainCharacter_whenNotNullParams_shouldExpectedValues() {
-   final BeverageEntity speciesEntity = new BeverageEntity(COLOR, NAME, URL, idExt, null);
-   final PokeCharacterEntity expected = new PokeCharacterEntity(NAME, 3, 4,5,speciesEntity);
+  @Test
+  public void mapToDomainAggregator_whenNull_shouldReturnNull() {
+    final BeverageAggregate result = mapper.mapDetail((BeverageEntity) null);
 
-   final PokeCharacter result = mapper.map(expected);
+    assertNull(result);
+  }
 
-   assertNotNull(result);
-   assertNull(result.getId());
-   assertNotNull(result.getName());
-   assertNotNull(result.getHeight());
-   assertNotNull(result.getWeight());
-   assertNotNull(result.getBaseExperience());
-   }
+  @Test
+  public void mapToDomainAggregator_whenNullParams_shouldExpectedValues() throws Exception {
+    final BeverageEntity expected = new BeverageEntity(null, null, null, null, null, new ManufacturerEntity());
 
-   @Test public void mapToDomainCharacter_whenNullName_shouldExpectedValues() {
-   final BeverageEntity speciesEntity = new BeverageEntity(COLOR, NAME, URL, idExt, null);
-   final PokeCharacterEntity expected = new PokeCharacterEntity(null, 3, 4,5,speciesEntity);
+    mockMapManufacturer(new Manufacturer());
+    final BeverageAggregate result = mapper.mapDetail(expected);
 
-   final PokeCharacter result = mapper.map(expected);
+    assertNotNull(result);
+    assertNull(result.getId());
+    assertNull(result.getName());
+    assertNull(result.getDescription());
+    assertNull(result.getType());
+    assertNull(result.getGraduation());
+    assertNotNull(result.getManufacturer());
+  }
 
-   assertNotNull(result);
-   assertNull(result.getId());
-   assertNull(result.getName());
-   assertNotNull(result.getHeight());
-   assertNotNull(result.getWeight());
-   assertNotNull(result.getBaseExperience());
-   }
+  @Test
+  public void mapToDomainAggregator_whenNotNullParams_shouldExpectedValues() throws Exception {
+    final BeverageEntity expected = new BeverageEntity(ID, NAME, DESCRIPTION, TYPE, GRADUATION, new ManufacturerEntity());
 
-   @Test public void mapToDomainCharacter_whenNullBaseExperience_shouldExpectedValues() {
-   final BeverageEntity speciesEntity = new BeverageEntity(COLOR, NAME, URL, idExt, null);
-   final PokeCharacterEntity expected = new PokeCharacterEntity(NAME, null, 4,5,speciesEntity);
+    mockMapManufacturer(new Manufacturer());
+    final BeverageAggregate result = mapper.mapDetail(expected);
 
-   final PokeCharacter result = mapper.map(expected);
+    assertNotNull(result);
+    assertEquals(expected.getId(), result.getId());
+    assertEquals(expected.getDescription(), result.getDescription());
+    assertEquals(expected.getName(), result.getName());
+    assertEquals(expected.getType(), result.getType());
+    assertEquals(expected.getGraduation(), result.getGraduation());
+    assertNotNull(result.getManufacturer());
 
-   assertNotNull(result);
-   assertNull(result.getId());
-   assertNotNull(result.getName());
-   assertNotNull(result.getHeight());
-   assertNotNull(result.getWeight());
-   assertNull(result.getBaseExperience());
-   }
+  }
 
-   @Test public void mapToDomainCharacter_whenNullHeight_shouldExpectedValues() {
-   final BeverageEntity speciesEntity = new BeverageEntity(COLOR, NAME, URL, idExt, null);
-   final PokeCharacterEntity expected = new PokeCharacterEntity(NAME, 43, null,5,speciesEntity);
+  @Test
+  public void mapToDomainAggregator_whenNullGraduation_shouldExpectedValues() throws Exception {
+    final BeverageEntity expected = new BeverageEntity(ID, NAME, DESCRIPTION, TYPE, null, new ManufacturerEntity());
 
-   final PokeCharacter result = mapper.map(expected);
+    mockMapManufacturer(new Manufacturer());
+    final BeverageAggregate result = mapper.mapDetail(expected);
 
-   assertNotNull(result);
-   assertNull(result.getId());
-   assertNotNull(result.getName());
-   assertNull(result.getHeight());
-   assertNotNull(result.getWeight());
-   assertNotNull(result.getBaseExperience());
-   }
+    assertNotNull(result);
+    assertEquals(expected.getId(), result.getId());
+    assertEquals(expected.getDescription(), result.getDescription());
+    assertEquals(expected.getName(), result.getName());
+    assertEquals(expected.getType(), result.getType());
+    assertNull(result.getGraduation());
+    assertNotNull(result.getManufacturer());
+  }
 
-   @Test public void mapToDomainCharacter_whenNullWeight_shouldExpectedValues() {
-   final BeverageEntity speciesEntity = new BeverageEntity(COLOR, NAME, URL, idExt, null);
-   final PokeCharacterEntity expected = new PokeCharacterEntity(NAME, 43, 324,null,speciesEntity);
+  @Test
+  public void mapToDomainAggregator_whenNullType_shouldExpectedValues() throws Exception {
+    final BeverageEntity expected = new BeverageEntity(ID, NAME, DESCRIPTION, null, GRADUATION, new ManufacturerEntity());
 
-   final PokeCharacter result = mapper.map(expected);
+    mockMapManufacturer(new Manufacturer());
+    final BeverageAggregate result = mapper.mapDetail(expected);
 
-   assertNotNull(result);
-   assertNull(result.getId());
-   assertNotNull(result.getName());
-   assertNotNull(result.getHeight());
-   assertNull(result.getWeight());
-   assertNotNull(result.getBaseExperience());
-   }*/
+    assertNotNull(result);
+    assertEquals(expected.getId(), result.getId());
+    assertEquals(expected.getDescription(), result.getDescription());
+    assertEquals(expected.getName(), result.getName());
+    assertNull(result.getType());
+    assertEquals(expected.getGraduation(), result.getGraduation());
+    assertNotNull(result.getManufacturer());
+
+  }
+
+  @Test
+  public void mapToDomainAggregator_whenNullName_shouldExpectedValues() throws Exception {
+    final BeverageEntity expected = new BeverageEntity(ID, null, DESCRIPTION, TYPE, GRADUATION, new ManufacturerEntity());
+
+    mockMapManufacturer(new Manufacturer());
+    final BeverageAggregate result = mapper.mapDetail(expected);
+
+    assertNotNull(result);
+    assertEquals(expected.getId(), result.getId());
+    assertEquals(expected.getDescription(), result.getDescription());
+    assertNull(result.getName());
+    assertEquals(expected.getType(), result.getType());
+    assertEquals(expected.getGraduation(), result.getGraduation());
+    assertNotNull(result.getManufacturer());
+
+  }
+
+  @Test
+  public void mapToDomainAggregator_whenNullDescription_shouldExpectedValues() throws Exception {
+    final BeverageEntity expected = new BeverageEntity(ID, NAME, null, TYPE, GRADUATION, new ManufacturerEntity());
+
+    mockMapManufacturer(new Manufacturer());
+    final BeverageAggregate result = mapper.mapDetail(expected);
+
+    assertNotNull(result);
+    assertEquals(expected.getId(), result.getId());
+    assertEquals(expected.getName(), result.getName());
+    assertNull(result.getDescription());
+    assertEquals(expected.getType(), result.getType());
+    assertEquals(expected.getGraduation(), result.getGraduation());
+    assertNotNull(result.getManufacturer());
+
+  }
+
+  @Test
+  public void mapToDomainAggregator_whenNullManufacturer_shouldExpectedValues() throws Exception {
+    final BeverageEntity expected = new BeverageEntity(ID, NAME, DESCRIPTION, TYPE, GRADUATION, null);
+
+    mockMapManufacturer(null);
+    final BeverageAggregate result = mapper.mapDetail(expected);
+
+    assertNotNull(result);
+    assertEquals(expected.getId(), result.getId());
+    assertEquals(expected.getName(), result.getName());
+    assertEquals(expected.getDescription(), result.getDescription());
+    assertEquals(expected.getType(), result.getType());
+    assertEquals(expected.getGraduation(), result.getGraduation());
+    assertNull(result.getManufacturer());
+  }
+
+  private void mockMapManufacturer(final Manufacturer values) {
+    Mockito.when(manufacturerMapper.map(ArgumentMatchers.any(ManufacturerEntity.class))).thenReturn(values);
+  }
+
+  @Test
+  public void mapToPersistence_whenNull_shouldReturnNull() {
+    final BeverageEntity result = mapper.map((Beverage) null);
+
+    assertNull(result);
+  }
+
+  @Test
+  public void mapToPersistence_whenNullParams_shouldExpectedValues() throws Exception {
+    final Beverage expected = new Beverage(null, null, null, null, null);
+
+    final BeverageEntity result = mapper.map(expected);
+
+    assertNotNull(result);
+    assertNull(result.getId());
+    assertNull(result.getName());
+    assertNull(result.getDescription());
+    assertNull(result.getType());
+    assertNull(result.getGraduation());
+  }
+
+  @Test
+  public void mapToPersistence_whenNotNullParams_shouldExpectedValues() throws Exception {
+    final Beverage expected = new Beverage(ID, NAME, DESCRIPTION, TYPE, GRADUATION);
+
+    final BeverageEntity result = mapper.map(expected);
+
+    assertNotNull(result);
+    assertEquals(expected.getId(), result.getId());
+    assertEquals(expected.getDescription(), result.getDescription());
+    assertEquals(expected.getName(), result.getName());
+    assertEquals(expected.getType(), result.getType());
+    assertEquals(expected.getGraduation(), result.getGraduation());
+  }
+
+  @Test
+  public void mapToPersistence_whenNullGraduation_shouldExpectedValues() throws Exception {
+    final Beverage expected = new Beverage(ID, NAME, DESCRIPTION, TYPE, null);
+
+    final BeverageEntity result = mapper.map(expected);
+
+    assertNotNull(result);
+    assertEquals(expected.getId(), result.getId());
+    assertEquals(expected.getDescription(), result.getDescription());
+    assertEquals(expected.getName(), result.getName());
+    assertEquals(expected.getType(), result.getType());
+    assertNull(result.getGraduation());
+  }
+
+  @Test
+  public void mapToPersistence_whenNullType_shouldExpectedValues() throws Exception {
+    final Beverage expected = new Beverage(ID, NAME, DESCRIPTION, null, GRADUATION);
+
+    final BeverageEntity result = mapper.map(expected);
+
+    assertNotNull(result);
+    assertEquals(expected.getId(), result.getId());
+    assertEquals(expected.getDescription(), result.getDescription());
+    assertEquals(expected.getName(), result.getName());
+    assertNull(result.getType());
+    assertEquals(expected.getGraduation(), result.getGraduation());
+  }
+
+  @Test
+  public void mapToPersistence_whenNullName_shouldExpectedValues() throws Exception {
+    final Beverage expected = new Beverage(ID, null, DESCRIPTION, TYPE, GRADUATION);
+
+    final BeverageEntity result = mapper.map(expected);
+
+    assertNotNull(result);
+    assertEquals(expected.getId(), result.getId());
+    assertEquals(expected.getDescription(), result.getDescription());
+    assertNull(result.getName());
+    assertEquals(expected.getType(), result.getType());
+    assertEquals(expected.getGraduation(), result.getGraduation());
+  }
+
+  @Test
+  public void mapToPersistence_whenNullDescription_shouldExpectedValues() throws Exception {
+    final Beverage expected = new Beverage(ID, NAME, null, TYPE, GRADUATION);
+
+    final BeverageEntity result = mapper.map(expected);
+
+    assertNotNull(result);
+    assertEquals(expected.getId(), result.getId());
+    assertEquals(expected.getName(), result.getName());
+    assertNull(result.getDescription());
+    assertEquals(expected.getType(), result.getType());
+    assertEquals(expected.getGraduation(), result.getGraduation());
+  }
 }

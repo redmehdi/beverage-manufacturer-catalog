@@ -1,8 +1,8 @@
-package com.red.one.haufe.domain.services;
+package com.red.one.haufe.controller;
 
-public final class PokeDataset {
-
-   /** public static Beverage[] getSpecies() {
+public final class BeverageDtoDataset {
+/**
+    public static Beverage[] getSpecies() {
         return new Beverage[]{
                 new Beverage(1L, "color1", "name1", getCharacters()[0]),
                 new Beverage(2L, "color2", "name2", getCharacters()[1]),

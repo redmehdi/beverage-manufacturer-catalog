@@ -1,109 +1,81 @@
 package com.red.one.haufe.repositories;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import com.red.one.haufe.BaseTest;
+import com.red.one.haufe.BeverageDataset;
 import com.red.one.haufe.domain.entities.Beverage;
+import com.red.one.haufe.entities.BeverageEntity;
 import com.red.one.haufe.mappers.BeverageMapper;
 import com.red.one.haufe.mappers.BeverageMapperImpl;
-import org.junit.Before;
-import org.mockito.*;
+import com.red.one.haufe.mappers.ManufacturerMapper;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-public class BeverageAdapterTest {
-    @Mock
-    private BeverageRepository repository;
+public class BeverageAdapterTest extends BaseTest {
 
-    @Spy
-    private BeverageMapper mapper = new BeverageMapperImpl();
+  @Mock
+  private BeverageRepository repository;
 
-    @InjectMocks
-    private BeverageAdapter port;
+  @InjectMocks
+  private BeverageAdapter port;
 
-    @Before
-    public void onBefore() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        setUp();
-    }
+  private BeverageMapper mapper = new BeverageMapperImpl();
 
-    public void setUp() throws Exception {
-        // Method implemented when required
-    }
+  @Mock
+  private ManufacturerMapper manufacturerMapper;
 
-   /** @Test
-    public void findTop5ByHeight_whenNotNull_shouldExpectedSize() {
-        final BeverageEntity[] expectedEntities = BeverageDataset.getSpeciesEntity();
-        int expectedSize = expectedEntities.length;
-        List<BeverageEntity> values = Arrays.asList(expectedEntities);
-        mockFindTop5ByHeight(values);
+  @Override
+  protected void setUp() throws Exception {
+    setField(mapper, "manufacturerMapper", manufacturerMapper);
+    super.setUp();
+  }
 
-        final List<Beverage> result = port.findPrice();
+  @Test
+  public void findAll_whenNotNull_shouldExpectedSize() {
+    final BeverageEntity[] expectedEntities = BeverageDataset.getBeersEntity();
+    int expectedSize = expectedEntities.length;
+    List<BeverageEntity> values = Arrays.asList(expectedEntities);
+    mockFindAll(values);
 
-        Assertions.assertNotNull(result);
-        Assert.assertTrue(result.size() == expectedSize);
-    }
+    final Page<Beverage> result = port.findAll(Pageable.unpaged());
 
-    @Test
-    public void findTop5ByHeight_whenNotNull_shouldExpectedValues() {
-        final BeverageEntity[] expectedEntities = BeverageDataset.getSpeciesEntity();
-        List<BeverageEntity> values = Arrays.asList(expectedEntities);
-        mockFindTop5ByHeight(values);
+    assertNotNull(result);
+    assertEquals(expectedSize, result.getSize());
+  }
 
-        final List<Beverage> result = port.findPrice();
+  @Test
+  public void findAll_whenNotNull_shouldCallOnceRepository() {
+    final BeverageEntity[] expectedEntities = BeverageDataset.getBeersEntity();
+    List<BeverageEntity> values = Arrays.asList(expectedEntities);
+    mockFindAll(values);
 
-        Assertions.assertNotNull(result);
-        Beverage pricing = result.get(0);
-        Assert.assertNull(pricing.getId());
-    }
+    final Page<Beverage> result = port.findAll(Pageable.unpaged());
 
-    @Test
-    public void findTop5ByHeight_whenNull_shouldExpectedEmptyList() {
-        mockFindTop5ByHeight(Collections.EMPTY_LIST);
+    assertNotNull(result);
+    Mockito.verify(repository, Mockito.times(1)).findAll();
+  }
 
-        final List<Beverage> result = port.findPrice();
+  @Test
+  public void findAll_whenEmpty_shouldExpectedValues() {
+    mockFindAll(Collections.emptyList());
 
-        Assertions.assertEquals(Collections.EMPTY_LIST, result);
-    }
+    final Page<Beverage> result = port.findAll(Pageable.unpaged());
 
-    @Test
-    public void findTop5ByHeight_whenNotNull_shouldCallOnceRepository() {
-        final BeverageEntity[] expectedEntities = BeverageDataset.getSpeciesEntity();
-        List<BeverageEntity> values = Arrays.asList(expectedEntities);
-        mockFindTop5ByHeight(values);
+    assertNull(result);
+  }
 
-        final List<Beverage> result = port.findPrice();
+  private void mockFindAll(final List<BeverageEntity> values) {
+    Mockito.when(repository.findAll()).thenReturn(values);
 
-        Assertions.assertNotNull(result);
-        Mockito.verify(repository, Mockito.times(1)).findPrice();
-       // Mockito.verify(repository, Mockito.never()).findTop5ByWeight();
-        //Mockito.verify(repository, Mockito.never()).findTop5ByBaseExperience();
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void findTop5ByHeight_whenNotNull_shouldExpectedException() {
-        mockFindTop5ByHeight(new RuntimeException());
-
-        port.findPrice();
-    }
-
-    @Test
-    public void findTop5ByHeight_whenNotNull_shouldCall5TimesMapper() {
-        final BeverageEntity[] expectedEntities = BeverageDataset.getSpeciesEntity();
-        final int expectedSize = expectedEntities.length;
-        List<BeverageEntity> values = Arrays.asList(expectedEntities);
-        mockFindTop5ByHeight(values);
-
-        final List<Beverage> result = port.findPrice();
-
-        Assertions.assertNotNull(result);
-        Mockito.verify(mapper, Mockito.times(expectedSize)).map(Mockito.any(BeverageEntity.class));
-        //Mockito.verify(repository, Mockito.never()).findTop5ByWeight();
-        // Mockito.verify(repository, Mockito.never()).findTop5ByBaseExperience();
-    }
-
-
-    private void mockFindTop5ByHeight(final List<BeverageEntity> values) {
-        Mockito.when(repository.findPrice()).thenReturn(values);
-    }
-
-    private void mockFindTop5ByHeight(final RuntimeException values) {
-        Mockito.when(repository.findPrice()).thenThrow(values);
-    }*/
-
+  }
 }

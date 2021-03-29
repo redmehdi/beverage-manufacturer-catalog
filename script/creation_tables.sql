@@ -4,8 +4,8 @@ create table poke_species (
 	created_date timestamp, 
 	modified_by varchar(255), 
 	modified_date timestamp, 
-	color varchar(255), 
-	id_ext varchar(255), 
+	description varchar(255),
+	type varchar(255),
 	name varchar(255), url varchar(255), 
 	primary key (id))
 	ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;

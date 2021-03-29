@@ -1,7 +1,5 @@
 package com.red.one.haufe.domain.entities;
 
-import java.time.LocalDate;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,17 +13,13 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Beverage {
 
-  private UUID id;
+  private Long id;
 
-  private Integer brandId;
+  private String name;
 
-  private LocalDate startDate;
+  private String description;
 
-  private LocalDate endDate;
+  private String type;
 
-  private Long productId;
-
-  private Double price;
-
-  private String currency;
+  private Double graduation;
 }

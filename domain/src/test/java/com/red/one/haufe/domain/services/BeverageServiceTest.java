@@ -1,94 +1,98 @@
 package com.red.one.haufe.domain.services;
 
+import com.red.one.haufe.domain.entities.Beverage;
 import com.red.one.haufe.domain.ports.BeveragePort;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 public class BeverageServiceTest {
 
-    @Mock
-    private BeveragePort port;
+  @Mock
+  private BeveragePort port;
 
-    @InjectMocks
-    private BeverageService service;
+  @InjectMocks
+  private BeverageService service;
 
-    @Before
-    public void onBefore() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        setUp();
-    }
+  @Before
+  public void onBefore() throws Exception {
+    MockitoAnnotations.initMocks(this);
+    setUp();
+  }
 
-    public void setUp() throws Exception {
-        // Method implemented when required
-    }
-    /**
-    @Test
-    public void findTop5ByHeight_whenNotNull_shouldExpectedSize() {
-        final Beverage[] expectedDomain = PokeDataset.getSpecies();
-        int expectedSize = expectedDomain.length;
-        List<Beverage> values = Arrays.asList(expectedDomain);
-        mockFindTop5ByHeight(values);
+  public void setUp() throws Exception {
+    // Method implemented when required
+  }
 
-        final List<Beverage> result = service.getCurrentPrice();
+  @Test
+  public void findAll_whenNotNull_shouldExpectedSize() {
+    final Beverage[] expectedDomain = BeverageDataset.getBeers();
+    int expectedSize = expectedDomain.length;
+    List<Beverage> values = Arrays.asList(expectedDomain);
+    mockFindAll(new PageImpl(values));
 
-        Assertions.assertNotNull(result);
-        Assert.assertTrue(result.size() == expectedSize);
-    }
+    final Page<Beverage> result = service.findAll(Pageable.unpaged());
 
-    private void mockFindTop5ByHeight(final List<Beverage> values) {
-        Mockito.when(port.findPrice()).thenReturn(values);
-    }
+    Assert.assertNotNull(result);
+    Assert.assertTrue(result.getSize() == expectedSize);
+  }
 
-    private void mockFindTop5ByHeight(final RuntimeException values) {
-        Mockito.when(port.findPrice()).thenThrow(values);
-    }
+  @Test
+  public void findAll_whenNull_shouldExpectedEmptyList() {
+    mockFindAll(new PageImpl(Collections.emptyList()));
 
-    @Test
-    public void findTop5ByHeight_whenNotNull_shouldExpectedValues() {
-        final Beverage[] expectedDomain = PokeDataset.getSpecies();
-        List<Beverage> values = Arrays.asList(expectedDomain);
-        mockFindTop5ByHeight(values);
+    final Page<Beverage> result = service.findAll(Pageable.unpaged());
 
-        final List<Beverage> result = service.getCurrentPrice();
+    Assert.assertEquals(Collections.EMPTY_LIST, result.get().collect(Collectors.toList()));
+  }
 
-        Assertions.assertNotNull(result);
-        Beverage pricing = result.get(0);
-        Assert.assertEquals(expectedDomain[0].getId(), pricing.getId());
-        Assert.assertEquals(expectedDomain[0].getColor(), pricing.getColor());
-        Assert.assertEquals(expectedDomain[0].getName(), pricing.getName());
-    }
+  @Test
+  public void findAll_whenNotNull_shouldExpectedValues() {
+    final Beverage[] expectedDomain = BeverageDataset.getBeers();
+    List<Beverage> values = Arrays.asList(expectedDomain);
+    mockFindAll(new PageImpl(values));
 
-    @Test
-    public void findTop5ByHeight_whenNull_shouldExpectedEmptyList() {
-        mockFindTop5ByHeight(Collections.EMPTY_LIST);
+    final Page<Beverage> result = service.findAll(Pageable.unpaged());
 
-        final List<Beverage> result = service.getCurrentPrice();
+    Assert.assertNotNull(result);
+    final Optional<Beverage> first = result.get().findFirst();
+    Assertions.assertTrue(first.isPresent());
+    final Beverage beverage = first.get();
+    Assert.assertEquals(expectedDomain[0].getId(), beverage.getId());
+    Assert.assertEquals(expectedDomain[0].getDescription(), beverage.getDescription());
+    Assert.assertEquals(expectedDomain[0].getName(), beverage.getName());
+    Assert.assertEquals(expectedDomain[0].getGraduation(), beverage.getGraduation());
+    Assert.assertEquals(expectedDomain[0].getType(), beverage.getType());
+  }
 
-        Assertions.assertEquals(Collections.EMPTY_LIST, result);
-    }
+  @Test
+  public void findAll_whenNotNull_shouldCallOnceRepository() {
+    final Beverage[] expectedDomain = BeverageDataset.getBeers();
+    final List<Beverage> values = Arrays.asList(expectedDomain);
+    mockFindAll(new PageImpl(values));
+    final Pageable unpaged = Pageable.unpaged();
 
-    @Test
-    public void findTop5ByHeight_whenNotNull_shouldCallOnceRepository() {
-        final Beverage[] expectedDomain = PokeDataset.getSpecies();
-        List<Beverage> values = Arrays.asList(expectedDomain);
-        mockFindTop5ByHeight(values);
+    final Page<Beverage> result = service.findAll(unpaged);
 
-        final List<Beverage> result = service.getCurrentPrice();
+    Assert.assertNotNull(result);
+    Mockito.verify(port, Mockito.only()).findAll(ArgumentMatchers.eq(unpaged));
+  }
 
-        Assertions.assertNotNull(result);
-        Mockito.verify(port, Mockito.times(1)).findPrice();
-        Mockito.verify(port, Mockito.never()).findTop5ByWeight();
-        Mockito.verify(port, Mockito.never()).findTop5ByBaseExperience();
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void findTop5ByHeight_whenNotNull_shouldExpectedException() {
-        mockFindTop5ByHeight(new RuntimeException());
-
-        service.getCurrentPrice();
-    }
-
-    //The same unit test for findTop5ByWeight and findTop5ByBaseExperience*/
+  private void mockFindAll(final Page<Beverage> values) {
+    Mockito.when(port.findAll(Pageable.unpaged())).thenReturn(values);
+  }
 }

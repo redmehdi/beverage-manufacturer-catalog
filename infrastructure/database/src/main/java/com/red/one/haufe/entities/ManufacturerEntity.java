@@ -21,7 +21,8 @@ import lombok.Setter;
 public class ManufacturerEntity extends AuditEntity {
 
   @Id
-  @GeneratedValue(strategy= GenerationType.IDENTITY) Long id;
+  @GeneratedValue(strategy= GenerationType.IDENTITY)
+  private Long id;
 
   private String name;
 
@@ -31,12 +32,4 @@ public class ManufacturerEntity extends AuditEntity {
 
   @OneToMany
   private List<BeverageEntity> beverages;
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public Long getId() {
-    return id;
-  }
 }

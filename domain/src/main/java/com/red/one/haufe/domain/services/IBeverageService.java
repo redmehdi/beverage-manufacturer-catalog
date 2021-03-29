@@ -1,10 +1,18 @@
 package com.red.one.haufe.domain.services;
 
 import com.red.one.haufe.domain.entities.Beverage;
-import java.time.LocalDate;
-import reactor.core.publisher.Mono;
+import com.red.one.haufe.domain.entities.BeverageAggregate;
+import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface IBeverageService {
 
-    Mono<Beverage> getCurrentPrice(final LocalDate localDate, final Long productId, final Integer brandId);
+  Optional<Beverage> findById(final Long id);
+
+  Optional<BeverageAggregate> findDetailById(final Long id);
+
+  Page<Beverage> findAll(Pageable pageable);
+
+  Beverage save(Beverage beverage);
 }
